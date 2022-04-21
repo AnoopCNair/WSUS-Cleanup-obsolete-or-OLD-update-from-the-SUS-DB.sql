@@ -1,10 +1,47 @@
 \\.\pipe\MICROSOFT##WID\tsql\query
 
-Step 1: - Run the below query to get the number of superseded updates.
+# Step 1: - Run the below query to get the number of superseded updates.
  
-SELECT UpdateID FROM vwMinimalUpdate WHERE IsSuperseded = 1 AND Declined = 0
+# SELECT UpdateID FROM vwMinimalUpdate WHERE IsSuperseded = 1 AND Declined = 0
  
-Step 2: - Run below query to decline all the superseded updates.
+# Step 2: - Run below query to decline all the superseded updates.
+
+
+# ===============================================
+# Script to decline superseeded updates in WSUS.
+# ===============================================
+# It's recommended to run the script with the -SkipDecline switch to see how many superseded updates are in WSUS and to TAKE A BACKUP OF THE SUSDB before declining the updates.
+# Parameters:
+
+# $UpdateServer             = Specify WSUS Server Name
+# $UseSSL                   = Specify whether WSUS Server is configured to use SSL
+# $Port                     = Specify WSUS Server Port
+# $SkipDecline              = Specify this to do a test run and get a summary of how many superseded updates we have
+# $DeclineLastLevelOnly     = Specify whether to decline all superseded updates or only last level superseded updates
+# $ExclusionPeriod          = Specify the number of days between today and the release date for which the superseded updates must not be declined. Eg, if you want to keep superseded updates published within the last 2 months, specify a value of 60 (days)
+
+
+# Supersedence chain could have multiple updates.
+# For example, Update1 supersedes Update2. Update2 supersedes Update3. In this scenario, the Last Level in the supersedence chain is Update3.
+# To decline only the last level updates in the supersedence chain, specify the DeclineLastLevelOnly switch
+
+# Usage:
+# =======
+
+# To do a test run against WSUS Server without SSL
+# Decline-SupersededUpdates.ps1 -UpdateServer SERVERNAME -Port 8530 -SkipDecline
+
+# To do a test run against WSUS Server using SSL
+# Decline-SupersededUpdates.ps1 -UpdateServer SERVERNAME -UseSSL -Port 8531 -SkipDecline
+
+# To decline all superseded updates on the WSUS Server using SSL
+# Decline-SupersededUpdates.ps1 -UpdateServer SERVERNAME -UseSSL -Port 8531
+
+# To decline only Last Level superseded updates on the WSUS Server using SSL
+# Decline-SupersededUpdates.ps1 -UpdateServer SERVERNAME -UseSSL -Port 8531 -DeclineLastLevelOnly
+
+# To decline all superseded updates on the WSUS Server using SSL but keep superseded updates published within the last 2 months (60 days)
+# Decline-SupersededUpdates.ps1 -UpdateServer SERVERNAME -UseSSL -Port 8531 -ExclusionPeriod 60
  
 DECLARE @var1 uniqueidentifier
 DECLARE @msg nvarchar(100)
